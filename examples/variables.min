@@ -1,0 +1,5 @@
+var i = 0
+repeat(10) {
+	i++
+	print(i)
+}

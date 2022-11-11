@@ -1,0 +1,12 @@
+{
+  "files": {
+    "examples/helloworld.hex": [
+      {
+        "id": "3cee7b65-c7c1-4957-bd23-f5a4712ccef6",
+        "line": 1,
+        "version": 0,
+        "index": 0
+      }
+    ]
+  }
+}
