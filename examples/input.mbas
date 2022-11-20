@@ -1,0 +1,6 @@
+inb print "What's your name?"
+var name (inb input)
+inb print (add "Hello " name)
+inb while true,{
+    inb print (inb getkey)
+}

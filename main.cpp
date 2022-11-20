@@ -1,7 +1,51 @@
 #include <iostream>
 #include <stdio.h>
 
-#include "mbasic.cpp"
+#include <fstream>
+#include <iostream>
+#include <sstream> //std::stringstream
+
+// Define platform specific methods
+#ifdef _WIN32
+#include <Windows.h>
+void usleep(__int64 usec) { 
+    HANDLE timer; 
+    LARGE_INTEGER ft; 
+
+    ft.QuadPart = -(10*usec); // Convert to 100 nanosecond interval, negative value indicates relative time
+
+    timer = CreateWaitableTimer(NULL, TRUE, NULL); 
+    SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0); 
+    WaitForSingleObject(timer, INFINITE); 
+    CloseHandle(timer); 
+}
+#else
+#include <unistd.h>
+#include <termios.h>
+#include <thread>
+
+// No, I did not make this function, however, I have no clue who did ¯\_(ツ)_/¯
+char getch(void) {
+   char buf = 0;
+   struct termios old = {0};
+   fflush(stdout);
+   if(tcgetattr(0, &old) < 0)
+       perror("tcsetattr()");
+   old.c_lflag &= ~ICANON;
+   old.c_lflag &= ~ECHO;
+   old.c_cc[VMIN] = 1;
+   old.c_cc[VTIME] = 0;
+   if(tcsetattr(0, TCSANOW, &old) < 0)
+       perror("tcsetattr ICANON");
+   if(read(0, &buf, 1) < 0)
+       perror("read()");
+   old.c_lflag |= ICANON;
+   old.c_lflag |= ECHO;
+   if(tcsetattr(0, TCSADRAIN, &old) < 0)
+       perror("tcsetattr ~ICANON");
+   return buf;
+}
+#endif
 
 using namespace std;
 
@@ -13,11 +57,33 @@ void println(string text) {
 	std::cout << text << '\n';
 }
 
-int main() {
-	MBasic mbasic;
+char getkey() {
+	char key = getch();
+	
+	// Program breakout keys
+	switch(key) {}
+	return key;
+}
 
-	unsigned short status = mbasic.exec("run print \"Hello World!\"");
-	switch(status) {
+string open(string filename) {
+	ifstream f;
+    f.open(filename.c_str());
+    stringstream stream; stream << f.rdbuf();
+    return stream.str();
+}
+
+string input() {
+	string ret;
+	cin >> ret;
+	return ret;
+}
+
+#include "mbasic.cpp"
+
+void raise(struct exception::exception status) {
+	println(" " + to_string(status.line) + " | " + status.term);
+	print("     ");
+	switch(status.id) {
 		case 1:
 			println("[E] Expected a keyword");
 			break;
@@ -36,7 +102,36 @@ int main() {
 		case 6:
 			println("[E] Unknown data type");
 			break;
-		default:
+		case 7:
+			println("[E] Invalid jump position");
+			break;
+		case 8:
+			println("[E] Inbuilt method not found");
+			break;
+		case 9:
+			println("[E] Invalid data type");
+			break;
+		case 10:
+			println("[E] Data too large for data type");
+			break;
+		case 11:
+			println("[E] Source type cannot be casted to chosen data type");
+			break;
+		case 12:
+			println("[E] Variable does not exist");
 			break;
 	}
+}
+
+int main() {
+	MBasic mbasic;
+	mbasic.debug = false;
+
+	struct exception::exception status = mbasic.run(
+R"""(
+var b 48.0
+set b 5
+)""");
+	if(status.id)
+		raise(status);
 }

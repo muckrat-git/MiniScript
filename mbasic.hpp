@@ -1,34 +1,43 @@
 #ifndef _MBASIC_H
-
 #define _MBASIC_H
 
-#ifndef String
 #include <iostream>
+#include <algorithm>
+#include <map>
 #include <string>
 #define String std::string
-#endif
+
+#include "mbasic/exception.hpp"
 
 // Prototype MBasic class
 class MBasic {
-	unsigned short exception = 0;
+	struct exception::exception exception = exception::success;
 
 	public:
-	String variables;
+	struct var;
+
+	String return_val;
+	int return_type;
+	void _return(String val, int type) {
+		return_type = type;
+		return_val = val;
+	}
+
+	std::map<String, var> variables;
 
 	MBasic();
 
-	void except(unsigned short e);
-	unsigned short exec(String code);
-};
+	int depth=0;
 
-enum {
-	SUCCESS,
-	EXPECTED_KEYWORD,
-	EXPECTED_NAME,
-	EXPECTED_ARGUMENT,
-	INCOMPATIBLE_TYPES,
-	INVALID_OPERATION,
-	INVALID_DATA
+	// Exec variables
+	int line;
+	String current;
+	int max_lines = 255;
+	bool debug = false;
+
+	void except(unsigned short e);
+	struct exception::exception exec(String code);
+	struct exception::exception run(String code);
 };
 
 #endif
