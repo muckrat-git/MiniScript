@@ -1,46 +1,34 @@
 #ifndef _MBASIC_H
 
+#define _MBASIC_H
+
 #ifndef String
 #include <iostream>
 #include <string>
 #define String std::string
 #endif
 
-String token(String raw, char delim, int index) {
-	bool quote = false;
-	String word;
-	for(int i;i<raw.length();++i) {
-		if(raw.at(i) == '"') {
-			quote = !quote;
-		}
-		
-		if(raw.at(i) == delim && !quote) {
-			if(index == 0) {
-				return word + "\0";
-			}
-			word = "";
-			--index;
-		}
-		else {
-			word = word + raw.at(i);
-		}
-	}
-}
-
+// Prototype MBasic class
 class MBasic {
-	MBasic() {}
-	
-	void exec(String code) {
-		// MBasic code is made of three parts
-		// keyword name args
-		// E.G run print "Hello world!"
-		String keyword; // Tells the interpreter what to read the following code as
-		String name;    // The name of whatever is being used/set
-		String args;    // Arguments to tell what to do
+	unsigned short exception = 0;
 
-		
-	}
+	public:
+	String variables;
+
+	MBasic();
+
+	void except(unsigned short e);
+	unsigned short exec(String code);
 };
 
-#define _MBASIC_H
+enum {
+	SUCCESS,
+	EXPECTED_KEYWORD,
+	EXPECTED_NAME,
+	EXPECTED_ARGUMENT,
+	INCOMPATIBLE_TYPES,
+	INVALID_OPERATION,
+	INVALID_DATA
+};
+
 #endif

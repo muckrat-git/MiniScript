@@ -1,4 +1,4 @@
-var i int 0
+var i 0
 run repeat 10 {
 	set i i+1
 	run print i
