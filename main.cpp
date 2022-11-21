@@ -59,9 +59,6 @@ void println(string text) {
 
 char getkey() {
 	char key = getch();
-	
-	// Program breakout keys
-	switch(key) {}
 	return key;
 }
 
@@ -123,14 +120,13 @@ void raise(struct exception::exception status) {
 	}
 }
 
-int main() {
+int main(int argc, char** argv) {
 	MBasic mbasic;
 	mbasic.debug = false;
 
 	struct exception::exception status = mbasic.run(
 R"""(
-var b 48.0
-set b 5
+imp "examples/functions.mbas"
 )""");
 	if(status.id)
 		raise(status);

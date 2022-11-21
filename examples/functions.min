@@ -1,0 +1,6 @@
+def welcome(name) {
+    print("Hello " + name)
+}
+
+print("What's your name?")
+welcome(input())

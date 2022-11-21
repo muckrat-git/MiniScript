@@ -5,10 +5,13 @@
 #include "../mbasic.hpp"
 #include "exception.hpp"
 
-#ifndef String
 #include <iostream>
+#include <algorithm>
+#include <map>
 #include <string>
 using namespace std;
+
+#ifndef String
 #define String string
 #endif
 
@@ -31,7 +34,20 @@ namespace types {
         BOOLEAN,
         CHAR,
         BYTE,
-        LIST
+        LIST,
+        FUNC
+    };
+    String names[] = { // This does waste a bit of memory but should speed up the casting process by quite a bit
+        "void",
+        "int",
+        "double",
+        "str",
+        "code",
+        "bool",
+        "char",
+        "byte",
+        "list",
+        "func"
     };
 
     class type {
@@ -45,6 +61,8 @@ namespace types {
     };
 
     type from_str(String str, MBasic * scope);
+
+    void init_list(String varname, types::type list, int max_items, MBasic * scope);
 
     type add(type a, type b, MBasic * scope) {
         if(a.id != b.id) {
@@ -124,6 +142,83 @@ namespace types {
                 scope->except(exception::INVALID_OPERATION);
                 return type(0,"");
         }
+    }
+
+    type compare(type a, type b, MBasic * scope) {
+        if(a.id != b.id) {
+            scope->except(exception::INCOMPATIBLE_TYPES);
+            return type(0,"");
+        }
+        return type(BOOLEAN, a.val==b.val ? "true" : "false");
+    }
+
+    type invert(type a, MBasic * scope) {
+        if(a.id != BOOLEAN)
+            return type(BOOLEAN, a.val=="false" ? "true" : "false");
+        else {
+            scope->except(exception::INVALID_DATA_TYPE);
+            return type(0,"");
+        }
+    }
+
+    type bigger_than(type a, type b, MBasic * scope) {
+        if(a.id != b.id) {
+            scope->except(exception::INCOMPATIBLE_TYPES);
+            return type(0,"");
+        }
+        if(a.id == DOUBLE)
+            return type(BYTE, stod(a.val)>stod(b.val) ? "true" : "false");
+        else if(a.id == INTEGER)
+            return type(BYTE, stoi(a.val)>stoi(b.val) ? "true" : "false");
+        else if(a.id == BYTE)
+            return type(BYTE, a.val[0]>b.val[0] ? "true" : "false");
+        else {
+            scope->except(exception::INCOMPATIBLE_TYPES);
+            return type(0,"");
+        }
+    }
+
+    type smaller_than(type a, type b, MBasic * scope) {
+        if(a.id != b.id) {
+            scope->except(exception::INCOMPATIBLE_TYPES);
+            return type(0,"");
+        }
+        if(a.id == DOUBLE)
+            return type(BYTE, stod(a.val)<stod(b.val) ? "true" : "false");
+        else if(a.id == INTEGER)
+            return type(BYTE, stoi(a.val)<stoi(b.val) ? "true" : "false");
+        else if(a.id == BYTE)
+            return type(BYTE, a.val[0]<b.val[0] ? "true" : "false");
+        else {
+            scope->except(exception::INCOMPATIBLE_TYPES);
+            return type(0,"");
+        }
+    }
+
+    type bool_and(type a, type b, MBasic * scope) {
+        if(a.id != b.id) {
+            scope->except(exception::INCOMPATIBLE_TYPES);
+            return type(0,"");
+        }
+        if(!a.id == BOOLEAN) {
+            scope->except(exception::INVALID_DATA_TYPE);
+            return type(0,"");
+        }
+
+        return type(BOOLEAN, a.val=="true"&&b.val=="true" ? "true" : "false");
+    }
+
+    type bool_or(type a, type b, MBasic * scope) {
+        if(a.id != b.id) {
+            scope->except(exception::INCOMPATIBLE_TYPES);
+            return type(0,"");
+        }
+        if(!a.id == BOOLEAN) {
+            scope->except(exception::INVALID_DATA_TYPE);
+            return type(0,"");
+        }
+
+        return type(BOOLEAN, a.val=="true"||b.val=="true" ? "true" : "false");
     }
 
     type cast(type a, int t, MBasic * scope) {

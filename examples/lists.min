@@ -1,6 +1,0 @@
-# Lists are declared using square braces
-var list ["He", "World!"]
-
-# Elements can be accessed using the variable name and the item index (starting at 0)
-set list[0] "Hello"
-inb print (add list[0] list[1])

@@ -27,13 +27,17 @@ class MBasic {
 
 	MBasic();
 
-	int depth=0;
+	// Execution data
+	int depth=0; // The depth of the code being executed
+	int line; // The line of code being executed	
+	String current; // The current line being executed
+	bool exit = false; // Whether to exit after the current code line is done
 
-	// Exec variables
-	int line;
-	String current;
-	int max_lines = 255;
-	bool debug = false;
+	// Execution config
+	int max_lines = 255; // The maximum lines of code to be read
+	int max_list_items = 255; // The maximum amount of elements in a list
+	bool debug = false; // Whether to print debug messages
+	
 
 	void except(unsigned short e);
 	struct exception::exception exec(String code);
