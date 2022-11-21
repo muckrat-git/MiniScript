@@ -75,7 +75,110 @@ string input() {
 	return ret;
 }
 
-#include "mbasic.cpp"
+string strings[8]; //Max strings returned by split  
+  
+//Mirrors the python function "len" 
+int len(string str)  
+{  
+    int length = 0;  
+    for (int i = 0; str[i] != '\0'; i++) {  
+        length++;     
+    }  
+    return length;     
+}  
+int len(string strs[])  
+{  
+    int length = 0; 
+	bool end = false; 
+    while(!end){
+		try {
+			strs[length];
+		}
+		catch(const std::exception& e) {
+			end = true;
+		}
+        length++;  
+    }  
+    return length;     
+}  
+  
+//Mirrors the python function "split"
+string * split(string str, char seperator, string avoid, string unavoid) {  
+    int currIndex = 0, i = 0;  
+    int startIndex = 0, endIndex = 0;
+	bool quote[avoid.length()];
+	for(int ai = 0;ai<avoid.length();++ai) {
+		quote[ai] = false;
+	}
+	bool quoted = false;
+    while (i <= len(str)) {
+		quoted = false;
+		for(int ai = 0;ai<avoid.length();++ai) {
+			if(str[i] == avoid[ai] && !quote[ai]) {
+				quote[ai] = true;
+			}
+			else if(str[i] == unavoid[ai]) {
+				quote[ai] = false;
+			}
+
+			if(quote[ai]) {
+				quoted = true;
+			}
+		}
+
+        if ((str[i] == seperator && !quoted) || i == len(str)) {  
+            endIndex = i;  
+            string subStr = "";  
+            subStr.append(str, startIndex, endIndex - startIndex);  
+            strings[currIndex] = subStr;  
+            currIndex += 1;  
+            startIndex = endIndex + 1;
+        }  
+        i++;  
+    }
+	strings[currIndex] = "\0";  
+	return strings;
+}
+
+int split_p(string str, char seperator, string avoid, string unavoid, string * buf) {  
+    int currIndex = 0, i = 0;  
+    int startIndex = 0, endIndex = 0;
+	bool quote[avoid.length()];
+	for(int ai = 0;ai<avoid.length();++ai) {
+		quote[ai] = false;
+	}
+	bool quoted = false;
+    while (i <= len(str)) {
+		quoted = false;
+		for(int ai = 0;ai<avoid.length();++ai) {
+			if(str[i] == avoid[ai] && !quote[ai]) {
+				quote[ai] = true;
+			}
+			else if(str[i] == unavoid[ai]) {
+				quote[ai] = false;
+			}
+
+			if(quote[ai]) {
+				quoted = true;
+			}
+		}
+
+        if ((str[i] == seperator && !quoted) || i == len(str)) {  
+            endIndex = i;  
+            string subStr = "";  
+            subStr.append(str, startIndex, endIndex - startIndex);  
+            buf[currIndex] = subStr;  
+            currIndex += 1;  
+            startIndex = endIndex + 1;
+        }  
+        i++;  
+    }
+	buf[currIndex] = "\0";  
+	return currIndex;
+}
+
+#include "mbasic/mbasic.cpp"
+#include "miniscript/miniscript.cpp"
 
 void raise(struct exception::exception status) {
 	println(" " + to_string(status.line) + " | " + status.term);

@@ -2,7 +2,7 @@
 
 #define _MBASIC_TYPES
 
-#include "../mbasic.hpp"
+#include "mbasic.hpp"
 #include "exception.hpp"
 
 #include <iostream>

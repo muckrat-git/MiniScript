@@ -7,7 +7,7 @@
 #include <string>
 #define String std::string
 
-#include "mbasic/exception.hpp"
+#include "exception.hpp"
 
 // Prototype MBasic class
 class MBasic {
