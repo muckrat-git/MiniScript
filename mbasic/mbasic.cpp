@@ -263,6 +263,17 @@ struct exception::exception MBasic::exec(String code) {
 					break;
 			}
 		}
+		else if (name == "out") {
+			types::type t = types::from_str(args[0], this);
+			switch(t.id) { // For type specific print options
+				case types::BYTE:
+					print(to_string(t.val[0]));
+					break;
+				default:
+					print(t.val);
+					break;
+			}
+		}
 		else if (name == "type") {
 			_return(types::names[types::from_str(args[0], this).id], types::STRING);
 		}
@@ -330,6 +341,36 @@ struct exception::exception MBasic::exec(String code) {
 				condition = types::from_str(cond_str, this);
 				if(this->exception.id)
 					return this->exception;
+			}
+		}
+		else if(name == "try") {
+			String code_str = args[0];
+			types::type code = types::from_str(code_str, this);
+			if(this->exception.id)
+				return this->exception;
+			if(code.id != types::CODE) {
+				except(exception::INVALID_DATA_TYPE);
+				return this->exception;
+			}
+
+			++depth;
+			run(code.val);
+			--depth;
+			if(this->exception.id) {
+				exception.id = 0;
+				String exc_str = args[1];
+				if(exc_str!="") {
+					types::type except_code = types::from_str(exc_str, this);
+					if(this->exception.id)
+						return this->exception;
+					if(except_code.id != types::CODE) {
+						except(exception::INVALID_DATA_TYPE);
+						return this->exception;
+					}
+					++depth;
+					this->exception = run(except_code.val);
+					--depth;
+				}
 			}
 		}
 		else if(name == "if") {

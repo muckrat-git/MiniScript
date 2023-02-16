@@ -229,7 +229,14 @@ int main(int argc, char** argv) {
 
 	struct exception::exception status = mbasic.run(
 R"""(
-imp "examples/functions.mbas"
+inb print "MBasic Shell 1.0-dev"
+inb while true,{
+	inb out "> "
+	var exec (inb input)
+	inb while true,{
+		inb print "test"
+	}
+}
 )""");
 	if(status.id)
 		raise(status);
